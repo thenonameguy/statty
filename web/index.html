@@ -1,12 +1,103 @@
+<!doctype html>
 <html>
   <head>
-    <meta charset="uft-8">
-    <title>Statty</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js"></script>
-  </head>
-  <body>
-    <h1>Statty</h1>
-
-  </body>
+  	<title>Statty</title>
+		<meta charset="utf-8" />
+		<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+		<style type="text/css">
+			body {
+				background: #000;
+				margin: 0;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="c"></canvas>
+		<script>
+			var b = document.body;
+			var c = document.getElementsByTagName('canvas')[0];
+			var a = c.getContext('2d');
+		</script>
+		<script>
+			var w = window,
+				WIDTH = c.width = w.innerWidth || w.clientWidth,
+				HEIGHT = c.height = w.innerHeight || w.clientHeight,
+				data = '',
+				align_left = 40,
+				align_user = 200,
+				align_top = 40,
+				align_step = 18,
+				counter = 0,
+				counter_step = 4,
+				start_animation = false;
+			
+			a.fillStyle = "#fff";
+			a.fillRect(0,0,WIDTH,HEIGHT);
+			a.fillStyle = "#000";
+			a.font = 'italic 13px Tahoma';
+			
+			d3.json("http://"+document.location.host+"/data",function(json){
+				data=json;
+				a.fillText("uptime: "+data.Uptime.Length+" sec",align_left,(align_top+=align_step));
+				a.fillText("",align_left,(align_top+=align_step));
+				for (var i = 0; i < data.Cpus.List.length; i++){
+					a.fillText("User: "+data.Cpus.List[i].User+" sec",align_left+i*align_user,(align_top+align_step));
+					a.fillText("Nice: "+data.Cpus.List[i].Nice+" sec",align_left+i*align_user,(align_top+2*align_step));
+					a.fillText("Sys: "+data.Cpus.List[i].Sys+" sec",align_left+i*align_user,(align_top+3*align_step));
+					a.fillText("Idle: "+data.Cpus.List[i].Idle+" sec",align_left+i*align_user,(align_top+4*align_step));
+					a.fillText("Wait: "+data.Cpus.List[i].Wait+" sec",align_left+i*align_user,(align_top+5*align_step));
+					a.fillText("Irq: "+data.Cpus.List[i].Irq+" sec",align_left+i*align_user,(align_top+6*align_step));
+					a.fillText("SoftIrq: "+data.Cpus.List[i].SoftIrq+" sec",align_left+i*align_user,(align_top+7*align_step));
+					a.fillText("Stolen: "+data.Cpus.List[i].Stolen+" sec",align_left+i*align_user,(align_top+8*align_step));
+				}
+				
+				a.fillText("",align_left,(align_top+=9*align_step));
+				
+				a.fillText("Total: "+data.Swap.Total,align_left,(align_top+=align_step));
+				a.fillText("Used: "+data.Swap.Used,align_left,(align_top+=align_step));
+				a.fillText("Free: "+data.Swap.Free,align_left,(align_top+=align_step));
+				
+				a.fillText("",align_left,(align_top+=align_step));
+				
+				a.fillText("Total: "+data.Mem.Total,align_left,(align_top+=align_step));
+				a.fillText("Used: "+data.Mem.Used,align_left,(align_top+=align_step));
+				a.fillText("Free: "+data.Mem.Free,align_left,(align_top+=align_step));
+				a.fillText("ActualFree: "+data.Mem.ActualFree,align_left,(align_top+=align_step));
+				a.fillText("ActualUsed: "+data.Mem.ActualUsed,align_left,(align_top+=align_step));
+				
+				start_animation = true;
+			});
+			//User Nice Sys Idle Wait Irq SoftIrq Stolen
+			a.translate(.5,.5);
+			a.lineWidth = 1;
+			a.beginPath();
+			a.moveTo(align_left+align_user,align_top+11*align_step);
+			a.lineTo(align_left+align_user,align_top+11*align_step+9*align_step);
+			a.lineTo(align_left+align_user+20*align_step,align_top+11*align_step+9*align_step);
+			a.stroke();
+			
+			setInterval(function(){
+				if (start_animation){
+					a.strokeStyle = "#fff";
+					a.fillStyle = "#fff";
+					a.beginPath();
+					a.moveTo(align_left+align_user+20*align_step-counter-counter_step,align_top-9*align_step);
+					a.lineTo(align_left+align_user+20*align_step-counter-counter_step,align_top);
+					a.stroke();
+					a.fillRect(align_left+align_user+20*align_step-counter-counter_step,align_top+5-1,3,4);
+					
+					counter += counter_step;
+					if (counter > 20*align_step-5) counter = 0;
+					a.strokeStyle = "#000";
+					a.fillStyle = "#000";
+					a.beginPath();
+					a.moveTo(align_left+align_user+20*align_step-counter,align_top-9*align_step*(Math.sin((counter)/100*3.14)*Math.random()*0.2+0.5));
+					a.lineTo(align_left+align_user+20*align_step-counter,align_top);
+					a.stroke();
+					a.fillRect(align_left+align_user+20*align_step-counter-counter_step,align_top+5,2,2);
+				}
+			},1000/60);
+		</script>
+	</body>
 </html>
