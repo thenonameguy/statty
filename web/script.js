@@ -1,8 +1,15 @@
-var data;
-var sec=0.1;
+var w = window,
+  d = w.document,
+	xmlhttp = w.XMLHttpRequest ? XMLHttpRequest() : ActiveXObject("Microsoft.XMLHTTP"),
+	data = '';
+
+xmlhttp.onreadystatechange=function(){
+	if (xmlhttp.readyState==4 && xmlhttp.status==200){
+		data = xmlhttp.responseText;
+	}
+}
+
 setInterval(function(){
-  d3.json("http://"+document.location.host+"/data",function(json){
-  data=json;
-  document.getElementsByTagName("body")[0].innerHTML=JSON.stringify(json);
-  })
-},1000*sec);
+	xmlhttp.open('get',"http://"+document.location.host+"/data",true);
+	xmlhttp.send();
+},2000);
